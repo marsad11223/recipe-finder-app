@@ -2,6 +2,12 @@ import React from "react";
 import { FlatList, ActivityIndicator, StyleSheet } from "react-native";
 import RecipeCard from "@/components/RecipeCard";
 import { Recipe } from "@/utils/types";
+import { useAppDispatch, useAppSelector } from "@/redux/store";
+import { isFavoriteRecipe } from "@/utils/helpers";
+import {
+  addFavorite,
+  removeFavorite,
+} from "@/redux/reducers/favoriteList.reducers";
 
 interface RecipeListProps {
   recipes: Recipe[];
@@ -16,11 +22,27 @@ const RecipeList: React.FC<RecipeListProps> = ({
   onEndReached,
   onRecipePress,
 }) => {
+  const dispatch = useAppDispatch();
+  const { favoriteRecipes } = useAppSelector((state) => state.favoritesList);
+
+  const onToggleFavorite = (recipe: Recipe) => {
+    if (isFavoriteRecipe(favoriteRecipes, recipe.id)) {
+      dispatch(removeFavorite(recipe.id));
+    } else {
+      dispatch(addFavorite(recipe));
+    }
+  };
+
   return (
     <FlatList
       data={recipes}
       renderItem={({ item }) => (
-        <RecipeCard recipe={item} onPress={() => onRecipePress(item.id)} />
+        <RecipeCard
+          recipe={item}
+          onPress={() => onRecipePress(item.id)}
+          isFavorite={isFavoriteRecipe(favoriteRecipes, item.id)}
+          onToggleFavorite={() => onToggleFavorite(item)}
+        />
       )}
       keyExtractor={(item) => item.id.toString()}
       contentContainerStyle={styles.flatListContainer}

@@ -24,10 +24,15 @@ import {
   dietDefinitions,
   cuisines,
 } from "@/constants/constants";
+import { useAppDispatch, useAppSelector } from "@/redux/store";
 
 const { width } = Dimensions.get("window");
 
 export default function HomeScreen() {
+  const router = useRouter();
+  const dispatch = useAppDispatch();
+  const {} = useAppSelector((state) => state.favoritesList);
+
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [selectedMealType, setSelectedMealType] = useState<string>("");
   const [selectedDiet, setSelectedDiet] = useState<string>("");
@@ -37,7 +42,6 @@ export default function HomeScreen() {
   const [page, setPage] = useState<number>(1);
   const [hasMore, setHasMore] = useState<boolean>(true);
   const [collaspActions, setCollaspActions] = useState<boolean>(true);
-  const router = useRouter();
 
   const fetchAndSetRecipes = useCallback(
     async (
