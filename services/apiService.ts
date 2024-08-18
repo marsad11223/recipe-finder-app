@@ -33,6 +33,8 @@ export const fetchRecipes = async (
     return response.data.results;
   } catch (error) {
     console.error("Error fetching recipes:", error);
-    throw new Error("An error occurred while fetching recipes.");
+    alert("An error occurred while fetching recipes.");
+
+    return [];
   }
 };
