@@ -1,14 +1,17 @@
 import React from "react";
 import { FlatList, ActivityIndicator, StyleSheet } from "react-native";
+import Toast from "react-native-toast-message";
+
 import RecipeCard from "@/components/RecipeCard";
-import { Recipe } from "@/utils/types";
-import { useAppDispatch, useAppSelector } from "@/redux/store";
-import { isFavoriteRecipe } from "@/utils/helpers";
+
 import {
   addFavorite,
   removeFavorite,
 } from "@/redux/reducers/favoriteList.reducers";
-import Toast from "react-native-toast-message";
+import { useAppDispatch, useAppSelector } from "@/redux/store";
+
+import { isFavoriteRecipe } from "@/utils/helpers";
+import { Recipe } from "@/utils/types";
 
 interface RecipeListProps {
   recipes: Recipe[];
