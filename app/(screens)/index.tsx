@@ -115,8 +115,11 @@ export default function HomeScreen() {
     fetchAndSetRecipes("", 1, selectedMealType, selectedDiet, selectedCuisine);
   }, [fetchAndSetRecipes, selectedMealType, selectedDiet, selectedCuisine]);
 
-  const handleRecipePress = (id: number) => {
-    // router.push(`/recipe-details?id=${id}`);
+  const handleRecipePress = (recipe: Recipe) => {
+    router.push({
+      pathname: "/(screens)/details",
+      params: { recipe: JSON.stringify(recipe) },
+    });
   };
 
   return (

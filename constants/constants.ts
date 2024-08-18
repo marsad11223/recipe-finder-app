@@ -1,5 +1,6 @@
 export const API_ENDPOINT = "https://api.spoonacular.com/recipes/complexSearch";
-export const API_KEY = "5f25bf54cd6c42c7b614550b0b4c0323";
+// export const API_KEY = "5f25bf54cd6c42c7b614550b0b4c0323";//marsad11223
+export const API_KEY = "f6b7c31723eb4a21ab69a9d8588bb082"; //marsad11223.us
 export const NUMBER_OF_RECIPES_PER_PAGE = 10;
 
 export const mealTypes: string[] = [

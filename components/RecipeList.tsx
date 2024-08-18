@@ -17,7 +17,7 @@ interface RecipeListProps {
   recipes: Recipe[];
   loading: boolean;
   onEndReached: () => void;
-  onRecipePress: (id: number) => void;
+  onRecipePress: (recipe: Recipe) => void;
 }
 
 const RecipeList: React.FC<RecipeListProps> = ({
@@ -51,7 +51,7 @@ const RecipeList: React.FC<RecipeListProps> = ({
       renderItem={({ item }) => (
         <RecipeCard
           recipe={item}
-          onPress={() => onRecipePress(item.id)}
+          onPress={() => onRecipePress(item)}
           isFavorite={isFavoriteRecipe(favoriteRecipes, item.id)}
           onToggleFavorite={() => onToggleFavorite(item)}
         />

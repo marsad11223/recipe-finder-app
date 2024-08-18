@@ -6,6 +6,7 @@ export default function Screens() {
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="index" />
       <Stack.Screen name="favorites" />
+      <Stack.Screen name="details" />
     </Stack>
   );
 }
