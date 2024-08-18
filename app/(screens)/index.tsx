@@ -11,14 +11,13 @@ import { useRouter } from "expo-router";
 
 import Toast from "react-native-toast-message";
 
+import useDebounce from "@/hooks/useDebounce";
 import { Collapsible } from "@/components/Collapsible";
 import SearchInput from "@/components/SearchInput";
 import FilterPicker from "@/components/FilterPicker";
 import ActionButtons from "@/components/ActionButtons";
 import RecipeList from "@/components/RecipeList";
 
-import { useAppDispatch, useAppSelector } from "@/redux/store";
-import useDebounce from "@/hooks/useDebounce";
 import { fetchRecipes } from "@/services/apiService";
 import { Recipe } from "@/utils/types";
 import {
@@ -32,8 +31,6 @@ const { width } = Dimensions.get("window");
 
 export default function HomeScreen() {
   const router = useRouter();
-  const dispatch = useAppDispatch();
-  const {} = useAppSelector((state) => state.favoritesList);
 
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [selectedMealType, setSelectedMealType] = useState<string>("");
@@ -109,7 +106,7 @@ export default function HomeScreen() {
 
   useEffect(() => {
     fetchAndSetRecipes("", 1, selectedMealType, selectedDiet, selectedCuisine);
-  }, [fetchAndSetRecipes, selectedMealType, selectedDiet, selectedCuisine]);
+  }, [selectedMealType, selectedDiet, selectedCuisine]);
 
   const handleRecipePress = (recipe: Recipe) => {
     router.push({
