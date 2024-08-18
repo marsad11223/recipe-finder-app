@@ -34,6 +34,15 @@ export const fetchRecipes = async (
     });
 
     return response.data.results;
+
+    // Use mock data if API call fails: Due to Spoonacular API limitations (150 requests per day).
+    // const promise = new Promise<Recipe[]>((resolve, reject) => {
+    //   setTimeout(() => {
+    //     resolve(dummyData);
+    //   }, 1500);
+    // });
+
+    // return promise;
   } catch (error) {
     console.error("Error fetching recipes:", error);
     throw new Error("Failed to fetch recipes", { cause: error });
