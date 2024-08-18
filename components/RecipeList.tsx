@@ -8,6 +8,7 @@ import {
   addFavorite,
   removeFavorite,
 } from "@/redux/reducers/favoriteList.reducers";
+import Toast from "react-native-toast-message";
 
 interface RecipeListProps {
   recipes: Recipe[];
@@ -28,8 +29,16 @@ const RecipeList: React.FC<RecipeListProps> = ({
   const onToggleFavorite = (recipe: Recipe) => {
     if (isFavoriteRecipe(favoriteRecipes, recipe.id)) {
       dispatch(removeFavorite(recipe.id));
+      Toast.show({
+        type: "success",
+        text1: "Recipe removed from favorites",
+      });
     } else {
       dispatch(addFavorite(recipe));
+      Toast.show({
+        type: "success",
+        text1: "Recipe added to favorites",
+      });
     }
   };
 

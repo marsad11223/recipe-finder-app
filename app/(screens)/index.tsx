@@ -9,12 +9,15 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 
+import Toast from "react-native-toast-message";
+
 import { Collapsible } from "@/components/Collapsible";
 import SearchInput from "@/components/SearchInput";
 import FilterPicker from "@/components/FilterPicker";
 import ActionButtons from "@/components/ActionButtons";
 import RecipeList from "@/components/RecipeList";
 
+import { useAppDispatch, useAppSelector } from "@/redux/store";
 import useDebounce from "@/hooks/useDebounce";
 import { fetchRecipes } from "@/services/apiService";
 import { Recipe } from "@/utils/types";
@@ -24,7 +27,6 @@ import {
   dietDefinitions,
   cuisines,
 } from "@/constants/constants";
-import { useAppDispatch, useAppSelector } from "@/redux/store";
 
 const { width } = Dimensions.get("window");
 
@@ -61,7 +63,11 @@ export default function HomeScreen() {
         );
         setHasMore(newRecipes.length === NUMBER_OF_RECIPES_PER_PAGE);
       } catch (error) {
-        alert("An error occurred while fetching recipes.");
+        Toast.show({
+          type: "error",
+          text1: "An error occurred while fetching recipes.",
+          text2: "Please try again later.",
+        });
       } finally {
         setLoading(false);
       }

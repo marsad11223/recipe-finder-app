@@ -1,3 +1,5 @@
+import { View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import {
   DarkTheme,
   DefaultTheme,
@@ -8,6 +10,8 @@ import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import "react-native-reanimated";
+
+import Toast from "react-native-toast-message";
 
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { ReduxProvider } from "@/redux/ReduxProvider";
@@ -34,10 +38,15 @@ export default function RootLayout() {
   return (
     <ReduxProvider>
       <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-        <Stack>
-          <Stack.Screen name="(screens)" options={{ headerShown: false }} />
-          <Stack.Screen name="+not-found" />
-        </Stack>
+        <SafeAreaView style={{ flex: 1 }}>
+          <View style={{ zIndex: 999 }}>
+            <Toast position="top" visibilityTime={2000} />
+          </View>
+          <Stack>
+            <Stack.Screen name="(screens)" options={{ headerShown: false }} />
+            <Stack.Screen name="+not-found" />
+          </Stack>
+        </SafeAreaView>
       </ThemeProvider>
     </ReduxProvider>
   );
