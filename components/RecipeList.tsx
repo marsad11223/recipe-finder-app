@@ -1,5 +1,5 @@
 import React from "react";
-import { FlatList, ActivityIndicator, StyleSheet } from "react-native";
+import { FlatList, ActivityIndicator, StyleSheet, Text } from "react-native";
 import Toast from "react-native-toast-message";
 
 import RecipeCard from "@/components/RecipeCard";
@@ -63,6 +63,9 @@ const RecipeList: React.FC<RecipeListProps> = ({
       ListFooterComponent={
         loading ? <ActivityIndicator size="large" color="#FF6347" /> : null
       }
+      ListEmptyComponent={
+        <Text style={styles.emptyText}>No results found</Text>
+      }
     />
   );
 };
@@ -71,6 +74,12 @@ const styles = StyleSheet.create({
   flatListContainer: {
     width: "100%",
     paddingBottom: 20,
+    marginTop: 20,
+  },
+  emptyText: {
+    textAlign: "center",
+    fontSize: 18,
+    color: "#555",
     marginTop: 20,
   },
 });
