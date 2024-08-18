@@ -1,6 +1,7 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { PropsWithChildren, useState } from "react";
+import { PropsWithChildren, useState, useEffect, useRef } from "react";
 import {
+  Animated,
   StyleSheet,
   TouchableOpacity,
   useColorScheme,
@@ -17,6 +18,20 @@ export function Collapsible({
   onPress = () => {},
 }: PropsWithChildren<{ title: string; isOpen: boolean; onPress: () => void }>) {
   const theme = useColorScheme() ?? "light";
+  const animation = useRef(new Animated.Value(isOpen ? 1 : 0)).current;
+
+  useEffect(() => {
+    Animated.timing(animation, {
+      toValue: isOpen ? 1 : 0,
+      duration: 300,
+      useNativeDriver: false,
+    }).start();
+  }, [isOpen]);
+
+  const height = animation.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, 350],
+  });
 
   return (
     <View style={styles.container}>
@@ -32,7 +47,9 @@ export function Collapsible({
           color={theme === "light" ? Colors.light.icon : Colors.dark.icon}
         />
       </TouchableOpacity>
-      {isOpen && <View style={styles.content}>{children}</View>}
+      <Animated.View style={[styles.content, { height, overflow: "hidden" }]}>
+        {children}
+      </Animated.View>
     </View>
   );
 }
