@@ -1,5 +1,4 @@
-import { useLocalSearchParams, useRouter } from "expo-router";
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -9,14 +8,31 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { Ionicons, FontAwesome } from "@expo/vector-icons";
 
+import Toast from "react-native-toast-message";
+
+import { useAppDispatch, useAppSelector } from "@/redux";
+import {
+  addFavorite,
+  removeFavorite,
+} from "@/redux/reducers/favoriteList.reducers";
+
+import { isFavoriteRecipe } from "@/utils/helpers";
 import { Recipe } from "@/utils/types";
 
 export default function RecipeDetailScreen() {
-  const { recipe } = useLocalSearchParams();
   const router = useRouter();
+  const dispatch = useAppDispatch();
+  const { recipe } = useLocalSearchParams();
+  const { favoriteRecipes } = useAppSelector((state) => state.favoritesList);
+
   const recipeData: Recipe = JSON.parse(recipe as string);
+
+  const [isFavorite, setIsFavorite] = useState(
+    isFavoriteRecipe(favoriteRecipes, recipeData.id)
+  );
 
   const ingredients = recipeData.analyzedInstructions[0]?.steps
     .flatMap((step) => step.ingredients)
@@ -27,6 +43,25 @@ export default function RecipeDetailScreen() {
       return acc;
     }, []);
 
+  const handleFavoriteToggle = () => {
+    setIsFavorite(!isFavorite);
+    if (isFavoriteRecipe(favoriteRecipes, recipeData.id)) {
+      dispatch(removeFavorite(recipeData.id));
+      setIsFavorite(false);
+      Toast.show({
+        type: "success",
+        text1: "Recipe removed from favorites",
+      });
+    } else {
+      dispatch(addFavorite(recipeData));
+      setIsFavorite(true);
+      Toast.show({
+        type: "success",
+        text1: "Recipe added to favorites",
+      });
+    }
+  };
+
   return (
     <View style={styles.container}>
       <ImageBackground
@@ -34,14 +69,26 @@ export default function RecipeDetailScreen() {
         style={styles.heroImage}
         resizeMode="cover"
       >
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => {
-            router.back();
-          }}
-        >
-          <Ionicons name="arrow-back" size={28} color="#fff" />
-        </TouchableOpacity>
+        <View style={styles.topRow}>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => {
+              router.back();
+            }}
+          >
+            <Ionicons name="arrow-back" size={28} color="#fff" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.favoriteButton}
+            onPress={handleFavoriteToggle}
+          >
+            <FontAwesome
+              name={isFavorite ? "heart" : "heart-o"}
+              size={24}
+              color={isFavorite ? "red" : "#fff"}
+            />
+          </TouchableOpacity>
+        </View>
         <View style={styles.overlay}>
           <Text style={styles.heroTitle}>{recipeData.title}</Text>
         </View>
@@ -93,6 +140,16 @@ const styles = StyleSheet.create({
     height: 250,
     justifyContent: "flex-end",
   },
+  topRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    paddingTop: 40,
+    position: "absolute",
+    width: "100%",
+    top: 0,
+  },
   overlay: {
     backgroundColor: "rgba(0, 0, 0, 0.5)",
     width: "100%",
@@ -105,9 +162,11 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   backButton: {
-    position: "absolute",
-    top: 40,
-    left: 20,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    borderRadius: 50,
+    padding: 5,
+  },
+  favoriteButton: {
     backgroundColor: "rgba(0, 0, 0, 0.5)",
     borderRadius: 50,
     padding: 5,
