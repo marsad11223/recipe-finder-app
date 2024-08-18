@@ -14,6 +14,9 @@ import { useRouter } from "expo-router";
 import { Picker } from "@react-native-picker/picker";
 
 import RecipeCard from "@/components/RecipeCard";
+import { Collapsible } from "@/components/Collapsible";
+
+import useDebounce from "@/hooks/useDebounce";
 import { fetchRecipes } from "@/services/apiService";
 import { Recipe } from "@/utils/types";
 import {
@@ -32,6 +35,7 @@ export default function HomeScreen() {
   const [loading, setLoading] = useState<boolean>(false);
   const [page, setPage] = useState<number>(1);
   const [hasMore, setHasMore] = useState<boolean>(true);
+  const [collaspActions, setCollaspActions] = useState<boolean>(true);
   const router = useRouter();
 
   const fetchAndSetRecipes = useCallback(
@@ -46,6 +50,7 @@ export default function HomeScreen() {
       try {
         const query = `${searchTerm} ${mealType} ${diet} ${cuisine}`.trim();
         const newRecipes = await fetchRecipes(query, page);
+        setCollaspActions(false);
         setRecipes((prevRecipes) =>
           page === 1 ? newRecipes : [...prevRecipes, ...newRecipes]
         );
@@ -59,16 +64,18 @@ export default function HomeScreen() {
     []
   );
 
-  const handleSearch = () => {
+  const handleSearch = (text: string) => {
     setPage(1);
     fetchAndSetRecipes(
-      searchTerm,
+      text,
       1,
       selectedMealType,
       selectedDiet,
       selectedCuisine
     );
   };
+
+  const debouncedSearch = useDebounce(handleSearch, 500);
 
   const handleLoadMore = () => {
     if (hasMore && !loading) {
@@ -115,53 +122,59 @@ export default function HomeScreen() {
           placeholder="Search for recipes..."
           placeholderTextColor="#aaa"
           value={searchTerm}
-          onChangeText={setSearchTerm}
+          onChangeText={(value) => {
+            debouncedSearch(value);
+            setSearchTerm(value);
+          }}
         />
-        <Picker
-          selectedValue={selectedMealType}
-          onValueChange={(itemValue) => setSelectedMealType(itemValue)}
-          style={styles.picker}
+        <Collapsible
+          title="Actions (Expand to Apply Filters)"
+          isOpen={collaspActions}
+          onPress={() => setCollaspActions(!collaspActions)}
         >
-          <Picker.Item label="Select Meal Type" value="" />
-          {mealTypes.map((type) => (
-            <Picker.Item key={type} label={type} value={type} />
-          ))}
-        </Picker>
-        <Picker
-          selectedValue={selectedDiet}
-          onValueChange={(itemValue) => setSelectedDiet(itemValue)}
-          style={styles.picker}
-        >
-          <Picker.Item label="Select Diet" value="" />
-          {dietDefinitions.map((diet) => (
-            <Picker.Item key={diet} label={diet} value={diet} />
-          ))}
-        </Picker>
-        <Picker
-          selectedValue={selectedCuisine}
-          onValueChange={(itemValue) => setSelectedCuisine(itemValue)}
-          style={styles.picker}
-        >
-          <Picker.Item label="Select Cuisine" value="" />
-          {cuisines.map((cuisine) => (
-            <Picker.Item key={cuisine} label={cuisine} value={cuisine} />
-          ))}
-        </Picker>
-        <TouchableOpacity style={styles.button} onPress={handleSearch}>
-          <Text style={styles.buttonText}>Search</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.button, styles.favoritesButton]}
-          onPress={() => router.push("/favorites")}
-        >
-          <Text style={styles.buttonText}>View Favorites</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.button, styles.clearFiltersButton]}
-          onPress={handleClearFilters}
-        >
-          <Text style={styles.buttonText}>Clear Filters</Text>
-        </TouchableOpacity>
+          <Picker
+            selectedValue={selectedMealType}
+            onValueChange={(itemValue) => setSelectedMealType(itemValue)}
+            style={styles.picker}
+          >
+            <Picker.Item label="Select Meal Type" value="" />
+            {mealTypes.map((type) => (
+              <Picker.Item key={type} label={type} value={type} />
+            ))}
+          </Picker>
+          <Picker
+            selectedValue={selectedDiet}
+            onValueChange={(itemValue) => setSelectedDiet(itemValue)}
+            style={styles.picker}
+          >
+            <Picker.Item label="Select Diet" value="" />
+            {dietDefinitions.map((diet) => (
+              <Picker.Item key={diet} label={diet} value={diet} />
+            ))}
+          </Picker>
+          <Picker
+            selectedValue={selectedCuisine}
+            onValueChange={(itemValue) => setSelectedCuisine(itemValue)}
+            style={styles.picker}
+          >
+            <Picker.Item label="Select Cuisine" value="" />
+            {cuisines.map((cuisine) => (
+              <Picker.Item key={cuisine} label={cuisine} value={cuisine} />
+            ))}
+          </Picker>
+          <TouchableOpacity
+            style={[styles.button, styles.clearFiltersButton]}
+            onPress={handleClearFilters}
+          >
+            <Text style={styles.buttonText}>Clear Filters</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.button, styles.favoritesButton]}
+            onPress={() => router.push("/favorites")}
+          >
+            <Text style={styles.buttonText}>View Favorites</Text>
+          </TouchableOpacity>
+        </Collapsible>
         {loading && page === 1 ? (
           <ActivityIndicator size="large" color="#FF6347" />
         ) : (
