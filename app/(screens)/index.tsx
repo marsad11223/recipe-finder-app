@@ -2,19 +2,18 @@ import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
   Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
   ImageBackground,
-  FlatList,
   ActivityIndicator,
   Dimensions,
+  StyleSheet,
 } from "react-native";
 import { useRouter } from "expo-router";
-import { Picker } from "@react-native-picker/picker";
 
-import RecipeCard from "@/components/RecipeCard";
 import { Collapsible } from "@/components/Collapsible";
+import SearchInput from "@/components/SearchInput";
+import FilterPicker from "@/components/FilterPicker";
+import ActionButtons from "@/components/ActionButtons";
+import RecipeList from "@/components/RecipeList";
 
 import useDebounce from "@/hooks/useDebounce";
 import { fetchRecipes } from "@/services/apiService";
@@ -25,6 +24,8 @@ import {
   dietDefinitions,
   cuisines,
 } from "@/constants/constants";
+
+const { width } = Dimensions.get("window");
 
 export default function HomeScreen() {
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -97,11 +98,10 @@ export default function HomeScreen() {
     setSelectedDiet("");
     setSelectedCuisine("");
     setPage(1);
-    fetchAndSetRecipes(searchTerm, 1, "", "", "");
+    fetchAndSetRecipes("", 1, "", "", "");
   };
 
   useEffect(() => {
-    // Fetch popular recipes on initial load
     fetchAndSetRecipes("", 1, selectedMealType, selectedDiet, selectedCuisine);
   }, [fetchAndSetRecipes, selectedMealType, selectedDiet, selectedCuisine]);
 
@@ -117,10 +117,7 @@ export default function HomeScreen() {
       <View style={styles.overlay} />
       <View style={styles.content}>
         <Text style={styles.title}>Recipe Finder</Text>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search for recipes..."
-          placeholderTextColor="#aaa"
+        <SearchInput
           value={searchTerm}
           onChangeText={(value) => {
             debouncedSearch(value);
@@ -132,74 +129,40 @@ export default function HomeScreen() {
           isOpen={collaspActions}
           onPress={() => setCollaspActions(!collaspActions)}
         >
-          <Picker
+          <FilterPicker
             selectedValue={selectedMealType}
             onValueChange={(itemValue) => setSelectedMealType(itemValue)}
-            style={styles.picker}
-          >
-            <Picker.Item label="Select Meal Type" value="" />
-            {mealTypes.map((type) => (
-              <Picker.Item key={type} label={type} value={type} />
-            ))}
-          </Picker>
-          <Picker
+            items={mealTypes}
+            placeholder="Select Meal Type"
+          />
+          <FilterPicker
             selectedValue={selectedDiet}
             onValueChange={(itemValue) => setSelectedDiet(itemValue)}
-            style={styles.picker}
-          >
-            <Picker.Item label="Select Diet" value="" />
-            {dietDefinitions.map((diet) => (
-              <Picker.Item key={diet} label={diet} value={diet} />
-            ))}
-          </Picker>
-          <Picker
+            items={dietDefinitions}
+            placeholder="Select Diet"
+          />
+          <FilterPicker
             selectedValue={selectedCuisine}
             onValueChange={(itemValue) => setSelectedCuisine(itemValue)}
-            style={styles.picker}
-          >
-            <Picker.Item label="Select Cuisine" value="" />
-            {cuisines.map((cuisine) => (
-              <Picker.Item key={cuisine} label={cuisine} value={cuisine} />
-            ))}
-          </Picker>
-          <TouchableOpacity
-            style={[styles.button, styles.clearFiltersButton]}
-            onPress={handleClearFilters}
-          >
-            <Text style={styles.buttonText}>Clear Filters</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.button, styles.favoritesButton]}
-            onPress={() => router.push("/favorites")}
-          >
-            <Text style={styles.buttonText}>View Favorites</Text>
-          </TouchableOpacity>
+            items={cuisines}
+            placeholder="Select Cuisine"
+          />
+          <ActionButtons onClearFilters={handleClearFilters} />
         </Collapsible>
         {loading && page === 1 ? (
           <ActivityIndicator size="large" color="#FF6347" />
         ) : (
-          <FlatList
-            data={recipes}
-            renderItem={({ item }) => (
-              <RecipeCard recipe={item} onPress={handleRecipePress} />
-            )}
-            keyExtractor={(item) => item.id.toString()}
-            contentContainerStyle={styles.flatListContainer}
+          <RecipeList
+            recipes={recipes}
+            loading={loading}
             onEndReached={handleLoadMore}
-            onEndReachedThreshold={0.5}
-            ListFooterComponent={
-              loading ? (
-                <ActivityIndicator size="large" color="#FF6347" />
-              ) : null
-            }
+            onRecipePress={handleRecipePress}
           />
         )}
       </View>
     </ImageBackground>
   );
 }
-
-const { width, height } = Dimensions.get("window");
 
 const styles = StyleSheet.create({
   background: {
@@ -226,48 +189,5 @@ const styles = StyleSheet.create({
     color: "#333",
     marginBottom: 20,
     textAlign: "center",
-  },
-  searchInput: {
-    height: height * 0.07,
-    width: "100%",
-    borderColor: "#ccc",
-    borderWidth: 1,
-    borderRadius: 8,
-    marginBottom: 15,
-    paddingLeft: 15,
-    backgroundColor: "#fff",
-    fontSize: 16,
-  },
-  picker: {
-    height: 50,
-    width: "100%",
-    marginBottom: 15,
-    borderColor: "#ccc",
-    borderWidth: 1,
-    borderRadius: 8,
-  },
-  button: {
-    width: "100%",
-    backgroundColor: "#FF6347",
-    paddingVertical: 15,
-    borderRadius: 8,
-    alignItems: "center",
-    marginBottom: 10,
-  },
-  favoritesButton: {
-    backgroundColor: "#4682B4",
-  },
-  clearFiltersButton: {
-    backgroundColor: "#6a0dad",
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  flatListContainer: {
-    width: "100%",
-    paddingBottom: 20,
-    marginTop: 20,
   },
 });
