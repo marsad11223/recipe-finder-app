@@ -11,6 +11,7 @@ import { useRouter } from "expo-router";
 import RecipeList from "@/components/RecipeList";
 
 import { useAppSelector } from "@/redux/store";
+import { Recipe } from "@/utils/types";
 
 const { width } = Dimensions.get("window");
 
@@ -18,8 +19,11 @@ export default function HomeScreen() {
   const router = useRouter();
   const { favoriteRecipes } = useAppSelector((state) => state.favoritesList);
 
-  const handleRecipePress = (id: number) => {
-    // router.push(`/recipe-details?id=${id}`);
+  const handleRecipePress = (recipe: Recipe) => {
+    router.push({
+      pathname: "/(screens)/details",
+      params: { recipe: JSON.stringify(recipe) },
+    });
   };
 
   return (
