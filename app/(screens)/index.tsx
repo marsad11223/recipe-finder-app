@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -45,35 +45,31 @@ export default function HomeScreen() {
   const [hasMore, setHasMore] = useState<boolean>(true);
   const [collaspActions, setCollaspActions] = useState<boolean>(true);
 
-  const fetchAndSetRecipes = useCallback(
-    async (
-      searchTerm: string,
-      page: number,
-      mealType: string,
-      diet: string,
-      cuisine: string
-    ) => {
-      setLoading(true);
-      try {
-        const query = `${searchTerm} ${mealType} ${diet} ${cuisine}`.trim();
-        const newRecipes = await fetchRecipes(query, page);
-        setCollaspActions(false);
-        setRecipes((prevRecipes) =>
-          page === 1 ? newRecipes : [...prevRecipes, ...newRecipes]
-        );
-        setHasMore(newRecipes.length === NUMBER_OF_RECIPES_PER_PAGE);
-      } catch (error) {
-        Toast.show({
-          type: "error",
-          text1: "An error occurred while fetching recipes.",
-          text2: "Please try again later.",
-        });
-      } finally {
-        setLoading(false);
-      }
-    },
-    []
-  );
+  const fetchAndSetRecipes = async (
+    searchTerm: string,
+    page: number,
+    mealType: string,
+    diet: string,
+    cuisine: string
+  ) => {
+    try {
+      const query = `${searchTerm} ${mealType} ${diet} ${cuisine}`.trim();
+      const newRecipes = await fetchRecipes(query, page);
+      setCollaspActions(false);
+      setRecipes((prevRecipes) =>
+        page === 1 ? newRecipes : [...prevRecipes, ...newRecipes]
+      );
+      setHasMore(newRecipes.length === NUMBER_OF_RECIPES_PER_PAGE);
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      Toast.show({
+        type: "error",
+        text1: "An error occurred while fetching recipes.",
+        text2: "Please try again later.",
+      });
+    }
+  };
 
   const handleSearch = (text: string) => {
     setPage(1);

@@ -58,7 +58,7 @@ const RecipeList: React.FC<RecipeListProps> = ({
       )}
       keyExtractor={(item) => item.id.toString()}
       contentContainerStyle={styles.flatListContainer}
-      onEndReached={onEndReached}
+      onEndReached={recipes.length > 0 ? onEndReached : undefined}
       onEndReachedThreshold={0.5}
       ListFooterComponent={
         loading ? <ActivityIndicator size="large" color="#FF6347" /> : null
