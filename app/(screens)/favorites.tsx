@@ -1,56 +1,70 @@
-import React, { useState } from "react";
-import { View, Text, TextInput, Button, StyleSheet } from "react-native";
+import React from "react";
+import {
+  View,
+  Text,
+  ImageBackground,
+  Dimensions,
+  StyleSheet,
+} from "react-native";
 import { useRouter } from "expo-router";
 
-export default function FavoritesScreen() {
-  const [searchTerm, setSearchTerm] = useState<string>("");
-  const router = useRouter();
+import RecipeList from "@/components/RecipeList";
 
-  const handleSearch = () => {
-    if (searchTerm.trim()) {
-      // router.push({ pathname: '/recipe-list', params: { searchTerm } });
-    } else {
-      alert("Please enter a search term");
-    }
+import { useAppSelector } from "@/redux/store";
+
+const { width } = Dimensions.get("window");
+
+export default function HomeScreen() {
+  const router = useRouter();
+  const { favoriteRecipes } = useAppSelector((state) => state.favoritesList);
+
+  const handleRecipePress = (id: number) => {
+    // router.push(`/recipe-details?id=${id}`);
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Favorites recipes</Text>
-      <TextInput
-        style={styles.searchInput}
-        placeholder="Search for recipes..."
-        value={searchTerm}
-        onChangeText={setSearchTerm}
-      />
-      <Button title="Search" onPress={handleSearch} />
-      <Button
-        title="View Favorites"
-        // onPress={() => router.push("/favorites")}
-      />
-    </View>
+    <ImageBackground
+      source={{ uri: "https://your-image-url.com/background.jpg" }}
+      style={styles.background}
+    >
+      <View style={styles.content}>
+        <Text style={styles.title}>Favorites Recipes</Text>
+
+        <RecipeList
+          recipes={favoriteRecipes}
+          loading={false}
+          onEndReached={() => {}}
+          onRecipePress={handleRecipePress}
+        />
+      </View>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  background: {
     flex: 1,
     justifyContent: "center",
-    padding: 16,
-    backgroundColor: "#fff",
+    alignItems: "center",
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  content: {
+    flex: 1,
+    width: width,
+    maxWidth: 500,
+    alignItems: "center",
+    backgroundColor: "rgba(255, 255, 255, 0.85)",
+    padding: 20,
+    borderRadius: 12,
   },
   title: {
-    fontSize: 24,
+    fontSize: 32,
     fontWeight: "bold",
+    color: "#333",
     marginBottom: 20,
     textAlign: "center",
-  },
-  searchInput: {
-    height: 40,
-    borderColor: "#ccc",
-    borderWidth: 1,
-    borderRadius: 8,
-    marginBottom: 16,
-    paddingLeft: 10,
   },
 });
