@@ -30,8 +30,16 @@ export default function RecipeCard({
   onToggleFavorite,
 }: RecipeCardProps) {
   return (
-    <TouchableOpacity style={styles.card} onPress={() => onPress(recipe.id)}>
-      <Image source={{ uri: recipe.image }} style={styles.image} />
+    <TouchableOpacity
+      style={styles.card}
+      onPress={() => onPress(recipe.id)}
+      testID="recipe-card"
+    >
+      <Image
+        source={{ uri: recipe.image }}
+        style={styles.image}
+        testID="recipe-image"
+      />
       <View style={styles.textContainer}>
         <Text style={styles.title}>{recipe.title}</Text>
       </View>

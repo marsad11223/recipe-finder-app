@@ -15,33 +15,25 @@ export const fetchRecipes = async (
   cuisine: string = ""
 ): Promise<Recipe[]> => {
   try {
-    // const response = await axios.get(API_ENDPOINT, {
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //   },
-    //   params: {
-    //     apiKey: API_KEY,
-    //     query,
-    //     number: NUMBER_OF_RECIPES_PER_PAGE,
-    //     addRecipeInformation: true,
-    //     addRecipeInstructions: true,
-    //     offset: (pageNumber - 1) * NUMBER_OF_RECIPES_PER_PAGE,
-    //     // Add filter parameters if provided
-    //     ...(mealType && { type: mealType }),
-    //     ...(diet && { diet }),
-    //     ...(cuisine && { cuisine }),
-    //   },
-    // });
-
-    // return response.data.results;
-
-    const promise = new Promise<Recipe[]>((resolve, reject) => {
-      setTimeout(() => {
-        resolve(dummyData);
-      }, 1500);
+    const response = await axios.get(API_ENDPOINT, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      params: {
+        apiKey: API_KEY,
+        query,
+        number: NUMBER_OF_RECIPES_PER_PAGE,
+        addRecipeInformation: true,
+        addRecipeInstructions: true,
+        offset: (pageNumber - 1) * NUMBER_OF_RECIPES_PER_PAGE,
+        // Add filter parameters if provided
+        ...(mealType && { type: mealType }),
+        ...(diet && { diet }),
+        ...(cuisine && { cuisine }),
+      },
     });
 
-    return promise;
+    return response.data.results;
   } catch (error) {
     console.error("Error fetching recipes:", error);
     throw new Error("Failed to fetch recipes", { cause: error });
